@@ -10,6 +10,7 @@ export default function MemeGenerator() {
   const [responseData, setResponseData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showOriginal, setShowOriginal] = useState(true); // For toggle state
 
   const handleImageUpload = async (imageDataUrl: string) => {
     setIsLoading(true);
@@ -28,7 +29,7 @@ export default function MemeGenerator() {
         const formData = new FormData();
         formData.append("file", file);
 
-        const response = await fetch("http://127.0.0.1:5000/api/cool", {
+        const response = await fetch("http://localhost:5001/api/cool", {
           method: "POST",
           body: formData,
         });
@@ -39,6 +40,8 @@ export default function MemeGenerator() {
 
         const data = await response.json();
 
+        console.log("data -->", data);
+
         // Check if data is valid JSON
         if (data && typeof data === "object" && data.meme_caption) {
           return data;
@@ -46,6 +49,7 @@ export default function MemeGenerator() {
           throw new Error("Invalid JSON response.");
         }
       } catch (err: any) {
+        console.error(err);
         if (attempt < maxRetries) {
           return fetchResponse(); // Retry
         }
@@ -69,7 +73,9 @@ export default function MemeGenerator() {
   };
 
   return (
-    <div className="bg-neutral-200 rounded-lg shadow-lg p-6">
+    <div
+      className="bg-neutral-200 rounded-lg shadow-lg p-6"
+    >
       {!uploadedImage ? (
         <ImageUploader onImageUpload={handleImageUpload} isLoading={isLoading} />
       ) : (
@@ -78,7 +84,59 @@ export default function MemeGenerator() {
             <p className="text-red-500 mb-4">{error}</p>
           ) : (
             <>
-              <MemePreview imageUrl={uploadedImage} memeCaption={responseData.meme_caption} />
+              <div
+                className="toggle-container"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginBottom: "1rem",
+                }}
+              >
+                <button
+                  onClick={() => setShowOriginal(true)}
+                  style={{
+                    padding: "0.5rem 1rem",
+                    marginRight: "0.5rem",
+                    borderRadius: "8px",
+                    backgroundColor: showOriginal ? "#d1d5db" : "#e5e7eb",
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: showOriginal ? "bold" : "normal",
+                    transition: "background-color 0.3s ease",
+                  }}
+                >
+                  Original Meme
+                </button>
+                <button
+                  onClick={() => setShowOriginal(false)}
+                  style={{
+                    padding: "0.5rem 1rem",
+                    borderRadius: "8px",
+                    backgroundColor: !showOriginal ? "#d1d5db" : "#e5e7eb",
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: !showOriginal ? "bold" : "normal",
+                    transition: "background-color 0.3s ease",
+                  }}
+                >
+                  Modified Meme
+                </button>
+              </div>
+
+              <div className="meme-content" style={{ textAlign: "center" }}>
+                {showOriginal ? (
+                  <MemePreview
+                    imageUrl={uploadedImage}
+                    memeCaption={responseData?.meme_caption}
+                  />
+                ) : (
+                  <MemePreview
+                    imageUrl={responseData?.output_img}
+                    memeCaption={responseData?.meme_caption}
+                  />
+                )}
+              </div>
+
               {responseData && (
                 <MiscellaneousData
                   memeTitle={responseData.meme_caption}
@@ -90,7 +148,21 @@ export default function MemeGenerator() {
           )}
           <button
             onClick={handleStartOver}
-            className="mt-4 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors"
+            style={{
+              marginTop: "1rem",
+              padding: "0.5rem 1rem",
+              backgroundColor: "#e5e7eb",
+              borderRadius: "8px",
+              border: "none",
+              cursor: "pointer",
+              transition: "background-color 0.3s ease",
+            }}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.backgroundColor = "#d1d5db")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.backgroundColor = "#e5e7eb")
+            }
           >
             Start Over
           </button>

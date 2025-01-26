@@ -92,3 +92,36 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+
+.transition-colors {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  background-color: #e5e7eb;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tab.active {
+  background-color: #d1d5db;
+  font-weight: bold;
+}
+
+.tab:hover {
+  background-color: #d1d5db;
+}
+
+.tab-content {
+  margin-top: 1rem;
+}
+
