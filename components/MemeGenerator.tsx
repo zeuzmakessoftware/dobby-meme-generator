@@ -119,7 +119,7 @@ export default function MemeGenerator() {
                     transition: "background-color 0.3s ease",
                   }}
                 >
-                  Modified Meme
+                  Objectified Meme
                 </button>
               </div>
 
